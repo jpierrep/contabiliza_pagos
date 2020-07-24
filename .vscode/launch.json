@@ -1,0 +1,44 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        
+       {
+            "name": "Launch via NPM",
+            "type": "node",
+            "request": "launch",
+           "cwd": "${workspaceRoot}",
+            //"program": "${workspaceFolder}",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+        "start"    
+        ],
+        //"console": "integratedTerminal",
+           // "port": 34616
+         //  "timeout": 20000
+        },
+
+   
+
+    
+
+
+    {
+        "type": "node",
+        "request": "launch",
+        "name": "Lanzar programa",
+      //  "program": "${workspaceFolder}/app.js"
+      "program":"${workspaceFolder}/index.js"
+    },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome against localhost",
+           // "url": "http://localhost:3800",
+           "url": "http://192.168.0.130:3800/liquidacion_sueldo/liquidacion_sueldo_cc_pdf_test/008-047/2019-08-01/0",
+          //  "webRoot": "${workspaceFolder}\\index.js"
+        }
+    ]
+}
