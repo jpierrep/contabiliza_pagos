@@ -23,9 +23,10 @@ var server = app.listen(5000, function () {
 
 var app=require('./app');
 var port= 3800;
-var ip='localhost';
+var ip='0.0.0.0';
 
 
     app.listen(port,ip,()=>{
         console.log("Servidor corriendo en ip "+ip+" puerto "+ port )
     });
+

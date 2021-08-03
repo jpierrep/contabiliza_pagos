@@ -12,6 +12,8 @@ var app=express();
  
   var liquidacion_sueldo=require('./routes/liquidacion_sueldo')
 
+  var contabiliza_pagos=require('./routes/contabiliza_pagos')
+
   //var follow_routes=require('./routes/follow');
 
   app.set('view engine','ejs')
@@ -36,6 +38,7 @@ var app=express();
 
 
 app.use('/liquidacion_sueldo',liquidacion_sueldo)
+app.use('/contabiliza_pagos',contabiliza_pagos)
 
 //ruta para archivos estaticos js,css, etc
 app.use(express.static('public'))
