@@ -132,7 +132,7 @@ async function getPagosContabilizar() {
 
 ---resumen por PAGO a contabilizar
 
-select IdPago,MontoPagoTotal,sum(SoftSaldo) as saldoDoctos ,sum(monto) as SumMontoPago,count(NumeroDocumento) as CantDoctos,MontoPagoTotal-sum(monto) as saldoPagos,sum(SoftSaldo)-sum(monto) as saldoDoctos
+select IdPago,MontoPagoTotal,sum(SoftSaldo) as saldoDoctos ,sum(monto) as SumMontoPago,count(NumeroDocumento) as CantDoctos,MontoPagoTotal-sum(monto) as saldoPagos,sum(SoftSaldo)-sum(monto) as saldoDoctosTotal
 from
 (
 

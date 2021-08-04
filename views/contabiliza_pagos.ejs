@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+  	<title>Table 03</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700' rel='stylesheet' type='text/css'>
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	
+	<link rel="stylesheet" href="/css/style.css">
+
+
+<style>
+.table tbody th, .table tbody td {
+ padding:10px;
+}
+
+</style>
+
+
+	</head>
+	<body>
+	<section class="ftco-section">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-md-6 text-center mb-5">
+					<h2 class="heading-section">PAGOS CONTABILIZAR</h2>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<h4 class="text-center mb-4">MES 07-2021</h4>
+
+                 <a href="#" id='contabiliza-button'  class="btn btn-secondary">GENERAR ARCHIVOS</a>
+               
+					<div class="table-wrap">
+						<table class="table">
+					    <thead class="thead-primary">
+					      <tr>
+					        <th>ID PAGO</th>
+					        <th>MONTO PAGO</th>
+					        <th>SALDO DOCTOS.</th>
+					        <th>MONTO CONTAB.</th>
+					        <th>CANT. DOCTOS</th>
+					        <th>SALDO PAGOS</th>
+					      </tr>
+					    </thead>
+					    <tbody>
+					      <tr>
+                            <% for (var x = 0;x < pagosResumen.length;x++){ %>
+					        <!--  <th scope="row" class="scope" >.com</th> -->
+					        <td><%=pagosResumen[x]['IdPago']%></td>
+                            <td><%=pagosResumen[x]['MontoPagoTotal']%></td>
+                            <td><%=pagosResumen[x]['saldoDoctos']%></td>
+                            <td><%=pagosResumen[x]['SumMontoPago']%></td>
+                            <td><%=pagosResumen[x]['CantDoctos']%></td>
+                             <th scope="row" class="scope" ><%=pagosResumen[x]['saldoPagos']%></th> 
+                             <!-- <td><a href="#" class="btn btn-primary">Sign Up</a></td> -->
+					      </tr>
+                          <% }  %>  
+					      <tr>
+					        <th scope="row" class="scope" >.net</th>
+					        <td>1 Year</td>
+					        <td>$75.00</td>
+					        <td>$5.00</td>
+					        <td>$5.00</td>
+					        <td><a href="#" class="btn btn-primary">Sign Up</a></td>
+					      </tr>
+					      <tr>
+					        <th scope="row" class="scope" >.org</th>
+					        <td>1 Year</td>
+					        <td>$65.00</td>
+					        <td>$5.00</td>
+					        <td>$5.00</td>
+					        <td><a href="#" class="btn btn-primary">Sign Up</a></td>
+					      </tr>
+					      <tr>
+					        <th scope="row" class="scope" >.biz</th>
+					        <td>1 Year</td>
+					        <td>$60.00</td>
+					        <td>$5.00</td>
+					        <td>$5.00</td>
+					        <td><a href="#" class="btn btn-primary">Sign Up</a></td>
+					      </tr>
+					      <tr>
+					        <th scope="row" class="scope" >.info</th>
+					        <td>1 Year</td>
+					        <td>$50.00</td>
+					        <td>$5.00</td>
+					        <td>$5.00</td>
+					        <td><a href="#" class="btn btn-primary">Sign Up</a></td>
+					      </tr>
+					      <tr>
+					        <th scope="row" class="scope border-bottom-0">.me</th>
+					        <td class="border-bottom-0">1 Year</td>
+					        <td class="border-bottom-0">$45.00</td>
+					        <td class="border-bottom-0">$5.00</td>
+					        <td class="border-bottom-0">$5.00</td>
+					        <td class="border-bottom-0"><a href="#" class="btn btn-primary">Sign Up</a></td>
+					      </tr>
+					    </tbody>
+					  </table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<script src="/js/jquery.min.js"></script>
+  <script src="/js/popper.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/main.js"></script>
+
+<script>
+  $("#contabiliza-button").click(function (event) {
+
+    console.log("boton apretado")
+    let data=null
+
+$.ajax({
+    type: "POST",
+    enctype: 'multipart/form-data',
+    url: "/contabiliza_pagos/test",
+    data: data,
+    processData: false,
+    contentType: false,
+    xhrFields:{
+            responseType: 'blob'
+        },
+    cache: false,
+    timeout: 600000,
+    success: function (blob) {
+console.log('success')
+
+
+var binaryData = [];
+binaryData.push(blob);
+url = window.URL.createObjectURL(new Blob(binaryData, {type: "application/zip"}))
+
+
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    // the filename you want
+    a.download = 'Guard Service.zip';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    alert('Archivos Generardos correctamente'); // or you know, something with better UX...
+
+        
+    },
+    error: function (e) {
+
+      
+        console.log("ERROR : ", e);
+
+
+    }
+});
+});
+</script>
+
+	</body>
+</html>
+

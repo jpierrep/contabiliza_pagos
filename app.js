@@ -36,12 +36,12 @@ var app=express();
   //use es un middelware se ejecuta antes de llegar a la accion del controlador en cada peticion que realice 
 
 
+//ruta para archivos estaticos js,css, etc
+app.use(express.static('public'))
 
 app.use('/liquidacion_sueldo',liquidacion_sueldo)
 app.use('/contabiliza_pagos',contabiliza_pagos)
 
-//ruta para archivos estaticos js,css, etc
-app.use(express.static('public'))
 
 
 

@@ -2,9 +2,28 @@
 
 var express = require('express');
 var fs = require('fs');
-
+var zip = require('express-zip');
 var SoftlandController = require('../controllers/softland');
 const Utils = require('../controllers/utils');
+
+
+
+
+
+async function getContabilizaPagos (req,res) {
+  console.log("he")
+
+  let pagosResumen= await SoftlandController.getPagosContabilizar()
+  console.log(pagosResumen.length)
+  res.render("contabiliza_pagos.ejs", { pagosResumen: pagosResumen });
+}
+
+
+
+
+
+
+
 
 async function getTest (req,res) {
 
@@ -56,9 +75,29 @@ pagosResumen.filter(x=>x["saldoPagos"]==0&&x["AreaCod"]==areaArchivo). forEach(p
 
 })
 
-return res.status(200).send({ status: "ok" })
+//return res.status(200).send({ status: "ok" })
+
+//const file = `testArchivos/002.txt`;
+//return res.download(file); // Set disposition and send it.
+
+/*
+res.zip([
+  { path: '/path/to/file1.name', name: '/path/in/zip/file1.name' }
+  { path: '/path/to/file2.name', name: 'file2.name' }
+]);
+*/
+let downloadFiles=distinctAreas.map(x=>{
+return {path:'testArchivos/'+x+'.txt',name:x+'.txt'}
+
+})
+console.log(downloadFiles)
+res.zip(
+ downloadFiles
+
+);
+
 }
 
 module.exports = {
-  getTest
+  getTest,getContabilizaPagos
   }
