@@ -22,7 +22,28 @@ function convierteRutID (rut){
     return replaceAll(prevstring, omit, place, string)
   }
 
+  function getUnique(data){
+    let unique = (value, index, self) => {
+        return self.indexOf(value) == index;
+    }
+    return data.filter(unique).sort(); 
+
+ }
+
+ function getUniqueProp(data,prop){
+
+  data=data.map(value=>{
+    return value[prop];
+  });
+
+  let unique = (value, index, self) => {
+      return self.indexOf(value) == index;
+  }
+  return data.filter(unique).sort(); 
+
+}
 
 
 
-  module.exports={convierteRutID}
+
+  module.exports={convierteRutID,getUniqueProp,getUnique}

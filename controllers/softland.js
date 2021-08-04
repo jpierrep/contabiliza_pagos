@@ -209,7 +209,7 @@ async function getPagosContabilizarDetalle() {
                      Select Enlaze.Documento as IdDocumento, CONVERT(int,replace(Documentos.Numero,' ','')) as NumeroDocumento,enlaze.Pago as IdPago, enlaze.Monto as Monto
                     ,Enlaze.Fecha as 'FechaPago',tabla.cantMovim as SoftCantMovim,tabla.saldo as SoftSaldo,tabla.fecha as SoftMinFecha,DocPago.Monto as MontoPagoTotal
                     ,DocPago.Fecha as FechaGral,DocPago.tipo as TipoPago,DocPago.Numero as NumeroPago, DocPago.Rut as RutCliente,DocPago.Codigo as CodigoCliente,Documentos.Nombre as NombreDocto
-                    ,CodAux,NomAux
+                    ,CodAux,NomAux,AreaCod
                     
                     From 
                     
@@ -223,13 +223,13 @@ async function getPagosContabilizarDetalle() {
                    ON Enlaze.Pago = DocPago.Id_Pago
               --     inner join @tabla as tabla on tabla.MovNumDocRef=CONVERT(int,replace(Documentos.Numero,' ','))
                    inner join (
-            select MovNumDocRef,SUM(MovDebe-MovHaber) as saldo,Count(*) as cantMovim, MIN(movFe) as Fecha, aux.Codaux,aux.rutAux ,aux.NomAux 
+            select MovNumDocRef,SUM(MovDebe-MovHaber) as saldo,Count(*) as cantMovim, MIN(movFe) as Fecha, aux.Codaux,aux.rutAux ,aux.NomAux ,mov.AreaCod
      FROM guard.[softland].[cwmovim] as mov 
      left join guard.[softland].[cwtauxi] as aux on mov.CodAux=AUX.CodAux 
   left join guard.softland.cwcpbte as comp on comp.CpbNum=mov.CpbNum and comp.CpbAno=mov.CpbAno and comp.CpbMes=mov.CpbMes 
       where  mov.CpbMes!='00' and   comp.CpbEst='V' and   PctCod='10-01-065'
     
-   group by MovNumDocRef, aux.Codaux,rutAux,aux.NomAux
+   group by MovNumDocRef, aux.Codaux,rutAux,aux.NomAux,mov.AreaCod
    
    having SUM(MovDebe-MovHaber)<>0
  
