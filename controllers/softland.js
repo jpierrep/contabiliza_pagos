@@ -122,6 +122,141 @@ async function getFichasInfoPromiseMes(fichas, empresa, mes) {
 
 
 
+async function getPagosContabilizar() {
+
+   //captura pagos
+
+  return new Promise(async  resolve => {
+    let pagosResumen = await sequelizeMssql.query(`
+   
+
+---resumen por PAGO a contabilizar
+
+select IdPago,MontoPagoTotal,sum(SoftSaldo) as saldoDoctos ,sum(monto) as SumMontoPago,count(NumeroDocumento) as CantDoctos,MontoPagoTotal-sum(monto) as saldoPagos,sum(SoftSaldo)-sum(monto) as saldoDoctos
+from
+(
+
+
+                  Select Enlaze.Documento as IdDocumento, CONVERT(int,replace(Documentos.Numero,' ','')) as NumeroDocumento,enlaze.Pago as IdPago, enlaze.Monto as Monto
+                 ,Enlaze.Fecha as 'FechaPago',tabla.cantMovim as SoftCantMovim,tabla.saldo as SoftSaldo,tabla.fecha as SoftMinFecha,DocPago.Monto as MontoPagoTotal
+                 ,DocPago.Fecha as FechaGral,DocPago.tipo as TipoPago,DocPago.Numero as NumeroPago, DocPago.Rut as RutCliente,DocPago.Codigo as CodigoCliente,Documentos.Nombre as NombreDocto
+            
+                 From 
+                 
+             
+                 Invoicing.dbo.Enlaze 
+                 Left JOIN Invoicing.dbo.Documentos 
+                 ON Documento = Id_Documento 
+                 LEFT JOIN Invoicing.dbo.Rubros 
+                 ON Documentos.Rubro = IdRubro 
+                 left Join Invoicing.dbo.DocPago 
+                ON Enlaze.Pago = DocPago.Id_Pago
+           --     inner join @tabla as tabla on tabla.MovNumDocRef=CONVERT(int,replace(Documentos.Numero,' ',''))
+                inner join (
+         select MovNumDocRef, SUM(MovDebe-MovHaber) as saldo,Count(*) as cantMovim, MIN(movFe) as Fecha, aux.Codaux,aux.rutAux ,aux.NomAux 
+  FROM guard.[softland].[cwmovim] as mov 
+  left join guard.[softland].[cwtauxi] as aux on mov.CodAux=AUX.CodAux 
+left join guard.softland.cwcpbte as comp on comp.CpbNum=mov.CpbNum and comp.CpbAno=mov.CpbAno and comp.CpbMes=mov.CpbMes 
+   where  mov.CpbMes!='00' and   comp.CpbEst='V' and   PctCod='10-01-065'
+ 
+group by MovNumDocRef, aux.Codaux,rutAux,aux.NomAux
+
+having SUM(MovDebe-MovHaber)<>0
+
+--order by  MIN(movFe)  asc
+        ) as tabla  on tabla.MovNumDocRef=CONVERT(int,replace(Documentos.Numero,' ',''))
+        
+        Where  DocPago.Empresa =0 And DocPago.Tipo in ( 1, 2, 3, 5, 6, 9, 10 ) --todos los tipos de pago menos castigo nota credito nota debito 
+                   and Documentos.Tipo  In (1)  --solo facturas facturas 
+       --    and DocPago.Fecha between '20210601' and '202010630'
+       and month(docPago.fecha)=07 and year(docPago.fecha)=2021
+--	 and CONVERT(int,replace(Documentos.Numero,' ','')) =214839
+
+               
+
+)a
+
+group by IdPago,MontoPagoTotal
+order by MontoPagoTotal-sum(monto) asc
+
+
+  
+
+                           `,
+      { type: sequelizeMssql.QueryTypes.SELECT, raw: true })
+
+
+    resolve(pagosResumen)
+
+  })
+
+}
+
+
+
+async function getPagosContabilizarDetalle() {
+
+  //captura pagos
+
+ return new Promise(async  resolve => {
+   let pagosDetalle = await sequelizeMssql.query(`
+  
+
+   select * from
+   (
+ 
+ 
+                     Select Enlaze.Documento as IdDocumento, CONVERT(int,replace(Documentos.Numero,' ','')) as NumeroDocumento,enlaze.Pago as IdPago, enlaze.Monto as Monto
+                    ,Enlaze.Fecha as 'FechaPago',tabla.cantMovim as SoftCantMovim,tabla.saldo as SoftSaldo,tabla.fecha as SoftMinFecha,DocPago.Monto as MontoPagoTotal
+                    ,DocPago.Fecha as FechaGral,DocPago.tipo as TipoPago,DocPago.Numero as NumeroPago, DocPago.Rut as RutCliente,DocPago.Codigo as CodigoCliente,Documentos.Nombre as NombreDocto
+                    ,CodAux,NomAux
+                    
+                    From 
+                    
+                
+                    Invoicing.dbo.Enlaze 
+                    Left JOIN Invoicing.dbo.Documentos 
+                    ON Documento = Id_Documento 
+                    LEFT JOIN Invoicing.dbo.Rubros 
+                    ON Documentos.Rubro = IdRubro 
+                    left Join Invoicing.dbo.DocPago 
+                   ON Enlaze.Pago = DocPago.Id_Pago
+              --     inner join @tabla as tabla on tabla.MovNumDocRef=CONVERT(int,replace(Documentos.Numero,' ','))
+                   inner join (
+            select MovNumDocRef,SUM(MovDebe-MovHaber) as saldo,Count(*) as cantMovim, MIN(movFe) as Fecha, aux.Codaux,aux.rutAux ,aux.NomAux 
+     FROM guard.[softland].[cwmovim] as mov 
+     left join guard.[softland].[cwtauxi] as aux on mov.CodAux=AUX.CodAux 
+  left join guard.softland.cwcpbte as comp on comp.CpbNum=mov.CpbNum and comp.CpbAno=mov.CpbAno and comp.CpbMes=mov.CpbMes 
+      where  mov.CpbMes!='00' and   comp.CpbEst='V' and   PctCod='10-01-065'
+    
+   group by MovNumDocRef, aux.Codaux,rutAux,aux.NomAux
+   
+   having SUM(MovDebe-MovHaber)<>0
+ 
+   --order by  MIN(movFe)  asc
+           ) as tabla  on tabla.MovNumDocRef=CONVERT(int,replace(Documentos.Numero,' ',''))
+           
+           Where  DocPago.Empresa =0 And DocPago.Tipo in ( 1, 2, 3, 5, 6, 9, 10 ) --todos los tipos de pago menos castigo nota credito nota debito 
+                      and Documentos.Tipo  In (1)  --solo facturas facturas 
+          --    and DocPago.Fecha between '20210601' and '202010630'
+          and month(docPago.fecha)=07 and year(docPago.fecha)=2021
+              --     order by Enlaze.Pago asc
+ 
+ 
+ )a
+ 
+ 
+
+                          `,
+     { type: sequelizeMssql.QueryTypes.SELECT, raw: true })
+
+
+   resolve(pagosDetalle)
+
+ })
+
+}
+
 
 
 
@@ -135,7 +270,7 @@ async function getFichasInfoPromiseMes(fichas, empresa, mes) {
 
 
 module.exports = {
-  getFichasInfoPromise, getFichasInfoPromiseMes
+  getFichasInfoPromise, getFichasInfoPromiseMes,getPagosContabilizar,getPagosContabilizarDetalle
 }
 
 
