@@ -132,15 +132,18 @@ async function getPagosContabilizar() {
 
 ---resumen por PAGO a contabilizar
 
-select IdPago,MontoPagoTotal,sum(SoftSaldo) as saldoDoctos ,sum(monto) as SumMontoPago,count(NumeroDocumento) as CantDoctos,MontoPagoTotal-sum(monto) as saldoPagos,sum(SoftSaldo)-sum(monto) as saldoDoctosTotal
+select IdPago,MontoPagoTotal,
+CodigoCliente,tipoPago,NombreCliente,convert(varchar,FechaGral,103) as FechaGral,
+sum(SoftSaldo) as saldoDoctos ,sum(monto) as SumMontoPago,count(NumeroDocumento) as CantDoctos,MontoPagoTotal-sum(monto) as saldoPagos,sum(SoftSaldo)-sum(monto) as saldoDoctosTotal
+
 from
 (
 
 
                   Select Enlaze.Documento as IdDocumento, CONVERT(int,replace(Documentos.Numero,' ','')) as NumeroDocumento,enlaze.Pago as IdPago, enlaze.Monto as Monto
                  ,Enlaze.Fecha as 'FechaPago',tabla.cantMovim as SoftCantMovim,tabla.saldo as SoftSaldo,tabla.fecha as SoftMinFecha,DocPago.Monto as MontoPagoTotal
-                 ,DocPago.Fecha as FechaGral,DocPago.tipo as TipoPago,DocPago.Numero as NumeroPago, DocPago.Rut as RutCliente,DocPago.Codigo as CodigoCliente,Documentos.Nombre as NombreDocto
-            
+                 ,DocPago.Fecha as FechaGral,DocPago.Numero as NumeroPago, DocPago.Rut as RutCliente,DocPago.Codigo as CodigoCliente,Documentos.Nombre as NombreDocto
+                 ,tipoPago.Descripcion as TipoPago,cli.Nombre as NombreCliente
                  From 
                  
              
@@ -151,6 +154,9 @@ from
                  ON Documentos.Rubro = IdRubro 
                  left Join Invoicing.dbo.DocPago 
                 ON Enlaze.Pago = DocPago.Id_Pago
+				left join Invoicing.dbo.Vigilancia as cli
+on  DocPago.Codigo=cli.Codigo and DocPago.Empresa=cli.Empresa
+left join Invoicing.dbo.TipoDeDocumentoDePago as tipoPago on DocPago.Tipo=tipoPago.IdTipo
            --     inner join @tabla as tabla on tabla.MovNumDocRef=CONVERT(int,replace(Documentos.Numero,' ',''))
                 inner join (
          select MovNumDocRef, SUM(MovDebe-MovHaber) as saldo,Count(*) as cantMovim, MIN(movFe) as Fecha, aux.Codaux,aux.rutAux ,aux.NomAux 
@@ -176,8 +182,8 @@ having SUM(MovDebe-MovHaber)<>0
 
 )a
 
-group by IdPago,MontoPagoTotal
-order by MontoPagoTotal-sum(monto) asc
+group by IdPago,MontoPagoTotal,CodigoCliente,tipoPago,NombreCliente,FechaGral
+order by MontoPagoTotal-sum(monto) asc,NombreCliente asc,CodigoCliente asc,FechaGral asc, IdPago asc
 
 
   

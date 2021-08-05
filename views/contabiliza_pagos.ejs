@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
-  	<title>Table 03</title>
+  	<title>Pagos Contab</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -15,6 +15,8 @@
 <style>
 .table tbody th, .table tbody td {
  padding:10px;
+ /* viene por defecto el scroller overflow-x: scroll; */
+
 }
 
 </style>
@@ -26,7 +28,7 @@
 		<div class="container">
 			<div class="row justify-content-center">
 				<div class="col-md-6 text-center mb-5">
-					<h2 class="heading-section">PAGOS CONTABILIZAR</h2>
+					<h2 class="heading-section">PAGOS A CONTABILIZAR</h2>
 				</div>
 			</div>
 			<div class="row">
@@ -39,8 +41,12 @@
 						<table class="table">
 					    <thead class="thead-primary">
 					      <tr>
-					        <th>ID PAGO</th>
-					        <th>MONTO PAGO</th>
+					        <th>CLIENTE NOMBRE</th>
+					        <th>CLIENTE CODI</th>
+                            <th>ID PAGO</th>
+                            <th>TIPO PAGO</th>
+                            <th>FECHA PAGO</th>
+                            <th>TOTAL PAGO</th>
 					        <th>SALDO DOCTOS.</th>
 					        <th>MONTO CONTAB.</th>
 					        <th>CANT. DOCTOS</th>
@@ -51,15 +57,22 @@
 					      <tr>
                             <% for (var x = 0;x < pagosResumen.length;x++){ %>
 					        <!--  <th scope="row" class="scope" >.com</th> -->
-					        <td><%=pagosResumen[x]['IdPago']%></td>
-                            <td><%=pagosResumen[x]['MontoPagoTotal']%></td>
-                            <td><%=pagosResumen[x]['saldoDoctos']%></td>
-                            <td><%=pagosResumen[x]['SumMontoPago']%></td>
+                            <td><%=pagosResumen[x]['NombreCliente'].substr(0,15)  %></td>
+                            <td><%=pagosResumen[x]['CodigoCliente'] %></td>
+                            <td><%=pagosResumen[x]['IdPago']%></td>
+                            <td><%=pagosResumen[x]['tipoPago'] %></td>
+                            <td><%=pagosResumen[x]['FechaGral'] %></td>
+                            <td><%=  new Intl.NumberFormat('en-US', {style: 'decimal'}).format(pagosResumen[x]['MontoPagoTotal'])   %></td>
+                            <td><%= new Intl.NumberFormat('en-US', {style: 'decimal'}).format(pagosResumen[x]['saldoDoctos'])  %></td>
+                            <td><%= new Intl.NumberFormat('en-US', {style: 'decimal'}).format(pagosResumen[x]['SumMontoPago'])  %></td>
+                          
                             <td><%=pagosResumen[x]['CantDoctos']%></td>
-                             <th scope="row" class="scope" ><%=pagosResumen[x]['saldoPagos']%></th> 
+                             <th scope="row" class="scope" ><%=new Intl.NumberFormat('en-US', {style: 'decimal'}).format(pagosResumen[x]['saldoPagos'])%></th> 
                              <!-- <td><a href="#" class="btn btn-primary">Sign Up</a></td> -->
 					      </tr>
                           <% }  %>  
+
+                            <!-- 
 					      <tr>
 					        <th scope="row" class="scope" >.net</th>
 					        <td>1 Year</td>
@@ -100,6 +113,8 @@
 					        <td class="border-bottom-0">$5.00</td>
 					        <td class="border-bottom-0"><a href="#" class="btn btn-primary">Sign Up</a></td>
 					      </tr>
+
+                           -->
 					    </tbody>
 					  </table>
 					</div>
