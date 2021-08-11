@@ -12,11 +12,23 @@ const Utils = require('../controllers/utils');
 
 async function getContabilizaPagos (req,res) {
   console.log("he")
-
-  let pagosResumen= await SoftlandController.getPagosContabilizar()
+ let mes='2021-08-01' //extraer ultimo mes por defecto
+ let empresa=0
+  let pagosResumen= await SoftlandController.getPagosContabilizar(empresa,mes)
   console.log(pagosResumen.length)
   res.render("contabiliza_pagos.ejs", { pagosResumen: pagosResumen });
 }
+
+async function getContabilizaPagosMes (req,res) {
+  console.log("he")
+ let empresa=req.body.empresa
+ let mes=req.body.mes
+ console.log(empresa,mes)
+  let pagosResumen= await SoftlandController.getPagosContabilizar(empresa,mes)
+  console.log(pagosResumen.length)
+  return res.status(200).send({status:'OK',pagosResumen: pagosResumen });
+}
+
 
 
 
@@ -99,5 +111,5 @@ res.zip(
 }
 
 module.exports = {
-  getTest,getContabilizaPagos
+  getTest,getContabilizaPagos,getContabilizaPagosMes
   }

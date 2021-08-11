@@ -19,11 +19,40 @@
 
 }
 
+.ftco-section {
+    padding: 2em 0;
+	 /* viene por defecto en style css 7em */
+}
+
 </style>
 
 
 	</head>
 	<body>
+		<div class="container">
+			<div class="row">
+		
+			  <div class="col-6"> Empresa:
+				<select id="empresa-select" onchange="actualizaData()" class="custom-select custom-select-lg mb-3">
+		
+				  <option selected value="0">Guard Service Seguridad S.A.</option>
+				  <option value="2">GS Outsourcing S.A.</option>
+		
+				</select>
+			  </div>
+			  <div class="col-6"> Mes:
+				<select id="mes-select" onchange="actualizaData()" class="custom-select custom-select-lg mb-3">
+		
+			   <option selected value="2020-11-01">2021-08</option>
+				  <option value="2020-10-01">2021-07</option>
+			  
+		
+				</select>
+			  </div>
+			</div>
+		  </div>
+
+
 	<section class="ftco-section">
 		<div class="container">
 			<div class="row justify-content-center">
@@ -33,12 +62,12 @@
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<h4 class="text-center mb-4">MES 07-2021</h4>
+				<!--<h4 class="text-center mb-4">MES 07-2021</h4>-->	
 
                  <a href="#" id='contabiliza-button'  class="btn btn-secondary">GENERAR ARCHIVOS</a>
                
 					<div class="table-wrap">
-						<table class="table">
+						<table id="pagos-table" class="table">
 					    <thead class="thead-primary">
 					      <tr>
 					        <th>CLIENTE NOMBRE</th>
@@ -176,6 +205,65 @@ url = window.URL.createObjectURL(new Blob(binaryData, {type: "application/zip"})
     }
 });
 });
+
+
+function actualizaData(){
+
+let data={"empresa":0,"mes":"2021-07-01"}
+
+	$.ajax({
+    type: "POST",
+    dataType: 'json',
+    contentType: 'application/json',
+    url: "/contabiliza_pagos/getPagosMes",
+    data: JSON.stringify(data),
+    processData: false,
+    cache: false,
+    timeout: 600000,
+    success: function (data) {
+
+      
+        console.log("SUCCESS : ", data);
+      
+        
+       if (data.status=="OK"){
+  console.log("todook")
+
+  $('#pagos-table.tbody').empty();
+
+   let rows=data["pagosResumen"]
+  for (var i = 0; i < rows.length; i++) {
+  var row = rows[i];
+
+  $('#pagos-table').append('<tr><td>' + row['NombreCliente'].substr(0,15) + '</td><td>' + row['CodigoCliente'] + '</td><td>' +
+  row['IdPago'] + '</td><td>' + row['tipoPago'] + '</td><td>' + row['FechaGral'] + '</td><td>' +
+	new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['MontoPagoTotal'])+ '</td><td>' +new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['saldoDoctos']) 
+		+ '</td><td>' + new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['SumMontoPago']) + '</td><td>' 
+		+	row['CantDoctos']+ '</td><th scope="row" class="scope" > '
+			+	new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['saldoPagos']+ '</th></tr>'));
+
+}
+
+
+       }else{
+
+         //si hay algun error el status no será OK, por lo que se debe eliminar la referencia del archivo subido, mandando triguer on chanque val('') este evento (on change) hara que se desactive
+         // y mostrar el mensaje
+         console.log("error en request")
+
+    
+        
+    }},
+    error: function (e) {
+
+    
+        console.log("ERROR : ", e);
+  
+
+    }
+});
+
+}
 </script>
 
 	</body>

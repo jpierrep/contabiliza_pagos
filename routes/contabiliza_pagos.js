@@ -9,6 +9,8 @@ api.post('/test',ContabilizaPagosController.getTest);
 
 api.get('/testView',ContabilizaPagosController.getContabilizaPagos);
 
+api.post('/getPagosMes',ContabilizaPagosController.getContabilizaPagosMes);
+
 //api.get('/testFiles',NominaBancariaController.getMontosNominaFiles);
 
 module.exports=api;

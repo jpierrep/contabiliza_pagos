@@ -122,9 +122,12 @@ async function getFichasInfoPromiseMes(fichas, empresa, mes) {
 
 
 
-async function getPagosContabilizar() {
+async function getPagosContabilizar(empresa,mes) {
 
    //captura pagos
+ let anioConsulta=mes.substr(0,4)
+ let mesConsulta=mes.substr(5,2)
+ console.log(mes,mesConsulta,anioConsulta)
 
   return new Promise(async  resolve => {
     let pagosResumen = await sequelizeMssql.query(`
@@ -175,7 +178,7 @@ having SUM(MovDebe-MovHaber)<>0
         Where  DocPago.Empresa =0 And DocPago.Tipo in ( 1, 2, 3, 5, 6, 9, 10 ) --todos los tipos de pago menos castigo nota credito nota debito 
                    and Documentos.Tipo  In (1)  --solo facturas facturas 
        --    and DocPago.Fecha between '20210601' and '202010630'
-       and month(docPago.fecha)=07 and year(docPago.fecha)=2021
+       and month(docPago.fecha)=`+mesConsulta+` and year(docPago.fecha)=`+anioConsulta+`
 --	 and CONVERT(int,replace(Documentos.Numero,' ','')) =214839
 
                
