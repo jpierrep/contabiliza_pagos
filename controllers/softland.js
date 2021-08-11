@@ -123,7 +123,7 @@ async function getFichasInfoPromiseMes(fichas, empresa, mes) {
 
 
 async function getPagosContabilizar(empresa,mes) {
-
+  let empresaDetalle = constants.EMPRESAS.find(x => x.ID == empresa).BD_SOFTLAND
    //captura pagos
  let anioConsulta=mes.substr(0,4)
  let mesConsulta=mes.substr(5,2)
@@ -163,9 +163,10 @@ left join Invoicing.dbo.TipoDeDocumentoDePago as tipoPago on DocPago.Tipo=tipoPa
            --     inner join @tabla as tabla on tabla.MovNumDocRef=CONVERT(int,replace(Documentos.Numero,' ',''))
                 inner join (
          select MovNumDocRef, SUM(MovDebe-MovHaber) as saldo,Count(*) as cantMovim, MIN(movFe) as Fecha, aux.Codaux,aux.rutAux ,aux.NomAux 
-  FROM guard.[softland].[cwmovim] as mov 
-  left join guard.[softland].[cwtauxi] as aux on mov.CodAux=AUX.CodAux 
-left join guard.softland.cwcpbte as comp on comp.CpbNum=mov.CpbNum and comp.CpbAno=mov.CpbAno and comp.CpbMes=mov.CpbMes 
+  FROM 
+  `+ empresaDetalle + `.[softland].[cwmovim] as mov left join
+  `+ empresaDetalle + `.[softland].[cwtauxi] as aux on mov.CodAux=AUX.CodAux left join 
+  `+ empresaDetalle + `.softland.cwcpbte as comp on comp.CpbNum=mov.CpbNum and comp.CpbAno=mov.CpbAno and comp.CpbMes=mov.CpbMes 
    where  mov.CpbMes!='00' and   comp.CpbEst='V' and   PctCod='10-01-065'
  
 group by MovNumDocRef, aux.Codaux,rutAux,aux.NomAux
@@ -175,7 +176,7 @@ having SUM(MovDebe-MovHaber)<>0
 --order by  MIN(movFe)  asc
         ) as tabla  on tabla.MovNumDocRef=CONVERT(int,replace(Documentos.Numero,' ',''))
         
-        Where  DocPago.Empresa =0 And DocPago.Tipo in ( 1, 2, 3, 5, 6, 9, 10 ) --todos los tipos de pago menos castigo nota credito nota debito 
+        Where  DocPago.Empresa =`+empresa+` And DocPago.Tipo in ( 1, 2, 3, 5, 6, 9, 10 ) --todos los tipos de pago menos castigo nota credito nota debito 
                    and Documentos.Tipo  In (1)  --solo facturas facturas 
        --    and DocPago.Fecha between '20210601' and '202010630'
        and month(docPago.fecha)=`+mesConsulta+` and year(docPago.fecha)=`+anioConsulta+`
@@ -203,7 +204,13 @@ order by MontoPagoTotal-sum(monto) asc,NombreCliente asc,CodigoCliente asc,Fecha
 
 
 
-async function getPagosContabilizarDetalle() {
+async function getPagosContabilizarDetalle(empresa,mes) {
+
+  let empresaDetalle = constants.EMPRESAS.find(x => x.ID == empresa).BD_SOFTLAND
+  //captura pagos
+let anioConsulta=mes.substr(0,4)
+let mesConsulta=mes.substr(5,2)
+console.log(mes,mesConsulta,anioConsulta)
 
   //captura pagos
 
@@ -233,9 +240,10 @@ async function getPagosContabilizarDetalle() {
               --     inner join @tabla as tabla on tabla.MovNumDocRef=CONVERT(int,replace(Documentos.Numero,' ','))
                    inner join (
             select MovNumDocRef,SUM(MovDebe-MovHaber) as saldo,Count(*) as cantMovim, MIN(movFe) as Fecha, aux.Codaux,aux.rutAux ,aux.NomAux ,mov.AreaCod
-     FROM guard.[softland].[cwmovim] as mov 
-     left join guard.[softland].[cwtauxi] as aux on mov.CodAux=AUX.CodAux 
-  left join guard.softland.cwcpbte as comp on comp.CpbNum=mov.CpbNum and comp.CpbAno=mov.CpbAno and comp.CpbMes=mov.CpbMes 
+     FROM 
+     `+ empresaDetalle + `.[softland].[cwmovim] as mov left join 
+     `+ empresaDetalle + `.[softland].[cwtauxi] as aux on mov.CodAux=AUX.CodAux  left join 
+     `+ empresaDetalle + `.softland.cwcpbte as comp on comp.CpbNum=mov.CpbNum and comp.CpbAno=mov.CpbAno and comp.CpbMes=mov.CpbMes 
       where  mov.CpbMes!='00' and   comp.CpbEst='V' and   PctCod='10-01-065'
     
    group by MovNumDocRef, aux.Codaux,rutAux,aux.NomAux,mov.AreaCod
@@ -245,10 +253,10 @@ async function getPagosContabilizarDetalle() {
    --order by  MIN(movFe)  asc
            ) as tabla  on tabla.MovNumDocRef=CONVERT(int,replace(Documentos.Numero,' ',''))
            
-           Where  DocPago.Empresa =0 And DocPago.Tipo in ( 1, 2, 3, 5, 6, 9, 10 ) --todos los tipos de pago menos castigo nota credito nota debito 
+           Where  DocPago.Empresa =`+empresa+` And DocPago.Tipo in ( 1, 2, 3, 5, 6, 9, 10 ) --todos los tipos de pago menos castigo nota credito nota debito 
                       and Documentos.Tipo  In (1)  --solo facturas facturas 
           --    and DocPago.Fecha between '20210601' and '202010630'
-          and month(docPago.fecha)=07 and year(docPago.fecha)=2021
+          and month(docPago.fecha)=`+mesConsulta+` and year(docPago.fecha)=`+anioConsulta+`
               --     order by Enlaze.Pago asc
  
  

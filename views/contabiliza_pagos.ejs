@@ -43,8 +43,15 @@
 			  <div class="col-6"> Mes:
 				<select id="mes-select" onchange="actualizaData()" class="custom-select custom-select-lg mb-3">
 		
-			   <option selected value="2020-11-01">2021-08</option>
-				  <option value="2020-10-01">2021-07</option>
+			   <option selected value="2021-08-01">2021-08</option>
+				  <option value="2021-07-01">2021-07</option>
+				  <option value="2021-06-01">2021-06</option>
+				  <option value="2021-05-01">2021-05</option>
+				  <option value="2021-04-01">2021-04</option>
+				  <option value="2021-03-01">2021-03</option>
+				  <option value="2021-02-01">2021-02</option>
+				  <option value="2021-01-01">2021-01</option>
+
 			  
 		
 				</select>
@@ -161,15 +168,21 @@
   $("#contabiliza-button").click(function (event) {
 
     console.log("boton apretado")
-    let data=null
+
+	let empresa=$("#empresa-select").val()
+ let mes=$("#mes-select").val()
+
+let data={"empresa":empresa,"mes":mes}
 
 $.ajax({
     type: "POST",
-    enctype: 'multipart/form-data',
+	//dataType: 'json', esto produce error al descargar el zip
+	enctype: 'multipart/form-data',
     url: "/contabiliza_pagos/test",
-    data: data,
+	data: JSON.stringify(data),
+	contentType: 'application/json',
     processData: false,
-    contentType: false,
+   
     xhrFields:{
             responseType: 'blob'
         },
@@ -208,8 +221,10 @@ url = window.URL.createObjectURL(new Blob(binaryData, {type: "application/zip"})
 
 
 function actualizaData(){
+	let empresa=$("#empresa-select").val()
+ let mes=$("#mes-select").val()
 
-let data={"empresa":0,"mes":"2021-07-01"}
+let data={"empresa":empresa,"mes":mes}
 
 	$.ajax({
     type: "POST",
@@ -229,7 +244,7 @@ let data={"empresa":0,"mes":"2021-07-01"}
        if (data.status=="OK"){
   console.log("todook")
 
-  $('#pagos-table.tbody').empty();
+  $('#pagos-table> tbody').empty();
 
    let rows=data["pagosResumen"]
   for (var i = 0; i < rows.length; i++) {
@@ -240,7 +255,7 @@ let data={"empresa":0,"mes":"2021-07-01"}
 	new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['MontoPagoTotal'])+ '</td><td>' +new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['saldoDoctos']) 
 		+ '</td><td>' + new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['SumMontoPago']) + '</td><td>' 
 		+	row['CantDoctos']+ '</td><th scope="row" class="scope" > '
-			+	new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['saldoPagos']+ '</th></tr>'));
+			+	new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['saldoPagos'])+ '</th></tr>');
 
 }
 

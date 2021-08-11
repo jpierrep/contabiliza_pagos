@@ -38,10 +38,13 @@ async function getContabilizaPagosMes (req,res) {
 
 
 async function getTest (req,res) {
-
-    console.log("test")
-   let pagosResumen= await SoftlandController.getPagosContabilizar()
-   let pagosDetalle= await SoftlandController.getPagosContabilizarDetalle()
+  console.log("gettest")
+  let empresa=req.body.empresa
+  let mes=req.body.mes
+  console.log(empresa,mes)
+    
+   let pagosResumen= await SoftlandController.getPagosContabilizar(empresa,mes)
+   let pagosDetalle= await SoftlandController.getPagosContabilizarDetalle(empresa,mes)
    let distinctAreas=Utils.getUniqueProp(pagosDetalle,'AreaCod')
    //existen pagos que tienen varias areas, deberá los con saldo 0, distribuirse segun el area
    pagosResumen.map(x=>{
