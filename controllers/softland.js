@@ -177,7 +177,7 @@ having SUM(MovDebe-MovHaber)<>0
         ) as tabla  on tabla.MovNumDocRef=CONVERT(int,replace(Documentos.Numero,' ',''))
         
         Where  DocPago.Empresa =`+empresa+` And DocPago.Tipo in ( 1, 2, 3, 5, 6, 9, 10 ) --todos los tipos de pago menos castigo nota credito nota debito 
-                   and Documentos.Tipo  In (1)  --solo facturas facturas 
+                   and Documentos.Tipo  In (1,6)  --solo facturas facturas y facturas exentas
        --    and DocPago.Fecha between '20210601' and '202010630'
        and month(docPago.fecha)=`+mesConsulta+` and year(docPago.fecha)=`+anioConsulta+`
 --	 and CONVERT(int,replace(Documentos.Numero,' ','')) =214839
@@ -224,7 +224,7 @@ console.log(mes,mesConsulta,anioConsulta)
  
                      Select Enlaze.Documento as IdDocumento, CONVERT(int,replace(Documentos.Numero,' ','')) as NumeroDocumento,enlaze.Pago as IdPago, enlaze.Monto as Monto
                     ,Enlaze.Fecha as 'FechaPago',tabla.cantMovim as SoftCantMovim,tabla.saldo as SoftSaldo,tabla.fecha as SoftMinFecha,DocPago.Monto as MontoPagoTotal
-                    ,DocPago.Fecha as FechaGral,DocPago.tipo as TipoPago,DocPago.Numero as NumeroPago, DocPago.Rut as RutCliente,DocPago.Codigo as CodigoCliente,Documentos.Nombre as NombreDocto
+                    ,convert(varchar,DocPago.Fecha,103) as FechaGral,DocPago.tipo as TipoPago,DocPago.Numero as NumeroPago, DocPago.Rut as RutCliente,DocPago.Codigo as CodigoCliente,Documentos.Nombre as NombreDocto
                     ,CodAux,NomAux,AreaCod
                     
                     From 
@@ -254,7 +254,7 @@ console.log(mes,mesConsulta,anioConsulta)
            ) as tabla  on tabla.MovNumDocRef=CONVERT(int,replace(Documentos.Numero,' ',''))
            
            Where  DocPago.Empresa =`+empresa+` And DocPago.Tipo in ( 1, 2, 3, 5, 6, 9, 10 ) --todos los tipos de pago menos castigo nota credito nota debito 
-                      and Documentos.Tipo  In (1)  --solo facturas facturas 
+           and Documentos.Tipo  In (1,6)  --solo facturas facturas y facturas exentas
           --    and DocPago.Fecha between '20210601' and '202010630'
           and month(docPago.fecha)=`+mesConsulta+` and year(docPago.fecha)=`+anioConsulta+`
               --     order by Enlaze.Pago asc

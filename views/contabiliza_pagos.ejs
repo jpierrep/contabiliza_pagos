@@ -170,6 +170,9 @@
     console.log("boton apretado")
 
 	let empresa=$("#empresa-select").val()
+	let empresaDetalle=$("#empresa-select").find(":selected").text();
+	console.log(empresaDetalle)
+
  let mes=$("#mes-select").val()
 
 let data={"empresa":empresa,"mes":mes}
@@ -201,7 +204,9 @@ url = window.URL.createObjectURL(new Blob(binaryData, {type: "application/zip"})
     a.style.display = 'none';
     a.href = url;
     // the filename you want
-    a.download = 'Guard Service.zip';
+  let fileName=
+
+    a.download = empresaDetalle+'-'+mes.substr(0,7)+ '.zip';
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);
