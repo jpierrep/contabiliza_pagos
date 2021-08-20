@@ -5,6 +5,7 @@ var fs = require('fs');
 var zip = require('express-zip');
 var SoftlandController = require('../controllers/softland');
 const Utils = require('../controllers/utils');
+const moment=require('moment')
 
 
 
@@ -12,11 +13,20 @@ const Utils = require('../controllers/utils');
 
 async function getContabilizaPagos (req,res) {
   console.log("he")
- let mes='2021-08-01' //extraer ultimo mes por defecto
+ let mes='2021-07-01' //extraer ultimo mes por defecto
+ mes=moment().startOf('month').format('YYYY-MM-DD')
+ let listMonths=[]
+ for (let index = 0; index < 12; index++) {
+
+  listMonths[index]=  moment(mes).subtract(index, 'months').format('YYYY-MM-DD');;
+  
+}
+console.log(listMonths)
+
  let empresa=0
   let pagosResumen= await SoftlandController.getPagosContabilizar(empresa,mes)
   console.log(pagosResumen.length)
-  res.render("contabiliza_pagos.ejs", { pagosResumen: pagosResumen });
+  res.render("contabiliza_pagos.ejs", { pagosResumen: pagosResumen,listaMeses:listMonths });
 }
 
 async function getContabilizaPagosMes (req,res) {
@@ -32,13 +42,13 @@ async function getContabilizaPagosMes (req,res) {
 
 
 
-async function getTest (req,res) {
+async function getArchivosContables (req,res) {
   console.log("gettest")
   let empresa=req.body.empresa
   let mes=req.body.mes
   console.log(empresa,mes)
     
-   let pagosResumen= await SoftlandController.getPagosContabilizar(empresa,mes)
+   let pagosResumen= (await SoftlandController.getPagosContabilizar(empresa,mes)).filter(x=>x["saldoPagos"]==0&&x["TipoPagoId"]==6) //por el momento solo depositos directo ya que cheques por ejemplo se contabilizan distinto
    let pagosDetalle= await SoftlandController.getPagosContabilizarDetalle(empresa,mes)
    
    //existen pagos que tienen varias areas, deberá los con saldo 0, distribuirse segun el area
@@ -65,9 +75,9 @@ console.log(dirDestino)
 distinctAreas.forEach(areaArchivo=>{
 
 
-let pagos=pagosResumen.filter(x=>x["saldoPagos"]==0&&x["AreaCod"]==areaArchivo)
+0
 
-pagos. forEach(pago=>{
+pagosResumen.filter(x=>x["AreaCod"]==areaArchivo). forEach(pago=>{
 /*
   {
     IdPago: 338815,
@@ -121,5 +131,5 @@ res.zip(
 }
 
 module.exports = {
-  getTest,getContabilizaPagos,getContabilizaPagosMes
+  getArchivosContables,getContabilizaPagos,getContabilizaPagosMes
   }
