@@ -165,6 +165,20 @@
   <script src="/js/main.js"></script>
 
 <script>
+$(document).ready(function () {
+
+	let listaMeses =  JSON.parse('<%-JSON.stringify(listaMeses)%>')
+	
+$('#mes-select').empty()
+   
+
+      listaMeses.map((mes,index)=>{
+		  if (index==0) $('#mes-select').append(`<option selected value="`+mes+`"> `+mes.substr(0,7)+`</option>`); 
+		 else $('#mes-select').append(`<option  value="`+mes+`"> `+mes.substr(0,7)+`</option>`); 
+      })
+
+	})
+
   $("#contabiliza-button").click(function (event) {
 
     console.log("boton apretado")
@@ -181,7 +195,7 @@ $.ajax({
     type: "POST",
 	//dataType: 'json', esto produce error al descargar el zip
 	enctype: 'multipart/form-data',
-    url: "/contabiliza_pagos/test",
+    url: "/contabiliza_pagos/getArchivosContables",
 	data: JSON.stringify(data),
 	contentType: 'application/json',
     processData: false,

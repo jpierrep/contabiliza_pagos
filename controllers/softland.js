@@ -136,7 +136,7 @@ async function getPagosContabilizar(empresa,mes) {
 ---resumen por PAGO a contabilizar
 
 select IdPago,MontoPagoTotal,
-CodigoCliente,tipoPago,NombreCliente,convert(varchar,FechaGral,103) as FechaGral,
+CodigoCliente,tipoPago,TipoPagoId,NombreCliente,convert(varchar,FechaGral,103) as FechaGral,
 sum(SoftSaldo) as saldoDoctos ,sum(monto) as SumMontoPago,count(NumeroDocumento) as CantDoctos,MontoPagoTotal-sum(monto) as saldoPagos,sum(SoftSaldo)-sum(monto) as saldoDoctosTotal
 
 from
@@ -146,7 +146,7 @@ from
                   Select Enlaze.Documento as IdDocumento, CONVERT(int,replace(Documentos.Numero,' ','')) as NumeroDocumento,enlaze.Pago as IdPago, enlaze.Monto as Monto
                  ,Enlaze.Fecha as 'FechaPago',tabla.cantMovim as SoftCantMovim,tabla.saldo as SoftSaldo,tabla.fecha as SoftMinFecha,DocPago.Monto as MontoPagoTotal
                  ,DocPago.Fecha as FechaGral,DocPago.Numero as NumeroPago, DocPago.Rut as RutCliente,DocPago.Codigo as CodigoCliente,Documentos.Nombre as NombreDocto
-                 ,tipoPago.Descripcion as TipoPago,cli.Nombre as NombreCliente
+                 ,tipoPago.Descripcion as TipoPago,DocPago.Tipo as TipoPagoId,cli.Nombre as NombreCliente
                  From 
                  
              
@@ -186,7 +186,7 @@ having SUM(MovDebe-MovHaber)<>0
 
 )a
 
-group by IdPago,MontoPagoTotal,CodigoCliente,tipoPago,NombreCliente,FechaGral
+group by IdPago,MontoPagoTotal,CodigoCliente,tipoPago,TipoPagoId,NombreCliente,FechaGral
 order by MontoPagoTotal-sum(monto) asc,NombreCliente asc,CodigoCliente asc,FechaGral asc, IdPago asc
 
 
