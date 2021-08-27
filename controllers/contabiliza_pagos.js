@@ -27,7 +27,9 @@ console.log(listMonths)
   let pagosResumen= await SoftlandController.getPagosContabilizar(empresa,mes)
   console.log(pagosResumen.length)
   res.render("contabiliza_pagos.ejs", { pagosResumen: pagosResumen,listaMeses:listMonths });
+
 }
+
 
 async function getContabilizaPagosMes (req,res) {
   console.log("he")
@@ -43,14 +45,30 @@ async function getContabilizaPagosMes (req,res) {
 
 
 async function getArchivosContables (req,res) {
-  console.log("gettest")
+ 
   let empresa=req.body.empresa
   let mes=req.body.mes
   console.log(empresa,mes)
-    
-   let pagosResumen= (await SoftlandController.getPagosContabilizar(empresa,mes)).filter(x=>x["saldoPagos"]==0&&x["TipoPagoId"]==6) //por el momento solo depositos directo ya que cheques por ejemplo se contabilizan distinto
-   let pagosDetalle= await SoftlandController.getPagosContabilizarDetalle(empresa,mes)
+
+  let pagosDetalle= await SoftlandController.getPagosContabilizarDetalle(empresa,mes)
+  //encuentra pagos descuadrados con sofltand (pago distinto a lo pendiente) para luegos filtrar
+  let pagosdocumentosNoCuadrados=pagosDetalle.filter(x=>parseInt( x['SoftSaldo'])<parseInt(x['Monto']))
+  let pagosNoCuadrados=[]
+  if (pagosdocumentosNoCuadrados.length>0)   pagosNoCuadrados=pagosdocumentosNoCuadrados.map(x=>x["IdPago"])
+ 
+
+   let pagosResumen= (await SoftlandController.getPagosContabilizar(empresa,mes)).filter(x=>x["saldoPagos"]==0&&x["TipoPagoId"]==6&&x["saldoDoctosTotal"]>=0
+   &&!pagosNoCuadrados.includes(x["IdPago"])
+   ) //por el momento solo depositos directo ya que cheques por ejemplo se contabilizan distinto
+   //se excluyen los pagos que no cuadren internamente con los documentos y aquellos pagos que tengan documentos no cuadrados
+ 
    
+
+   if (pagosResumen.length==0){
+    res.status(500).send( { status: "vacio" });
+   }
+
+
    //existen pagos que tienen varias areas, deberá los con saldo 0, distribuirse segun el area
    pagosResumen.map(x=>{
      x["AreaCod"]= pagosDetalle.find(y=>y["IdPago"]==x["IdPago"])["AreaCod"]
@@ -75,8 +93,6 @@ console.log(dirDestino)
 distinctAreas.forEach(areaArchivo=>{
 
 
-0
-
 pagosResumen.filter(x=>x["AreaCod"]==areaArchivo). forEach(pago=>{
 /*
   {
@@ -90,14 +106,14 @@ pagosResumen.filter(x=>x["AreaCod"]==areaArchivo). forEach(pago=>{
   */
 
   //10-01-003,549161,0,SOPRAVAL SPA. ,,,,,,,,,,,,,,,,DP,62,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  let asiento_encabezado='10-01-003,'+pago["MontoPagoTotal"]+',0,"'+pagosDetalle.find(x=>x["IdPago"]==pago["IdPago"])["NomAux"]+'",,,,,,,,,,,,,DP,62,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n'
+  let asiento_encabezado='10-01-003,'+pago["MontoPagoTotal"]+',0,"'+pagosDetalle.find(x=>x["IdPago"]==pago["IdPago"])["NomAux"]+'",,,,,,,,,,,,,DP,62,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\r\n'
   fs.appendFileSync(dirDestino+"/"+areaArchivo+".txt", asiento_encabezado);
 
     //aqui va el detalle que tiene que ir en el asiento
   //let asiento_detalle=
   pagosDetalle.filter(x=>x["IdPago"]==pago["IdPago"]).forEach(pagoDetalle=>{
   //  10-01-065,0,384413,SOPRAVAL SPA.  [P: 338204 D: 569912],,,,,,,,,,,,,,,82366700,DP,62,01/07/2021,01/07/2021,FV,216094 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  let asiento_detalle='10-01-065,0,'+pagoDetalle["Monto"]+',"'+pagoDetalle["NomAux"]+ ' [P:'+pagoDetalle["IdPago"]+' D:'+pagoDetalle["IdDocumento"]+']",,,,,,,,,,,,,,,'+pagoDetalle["CodAux"]+',DP,62,'+pagoDetalle["FechaGral"]+',' +pagoDetalle["FechaGral"]+',FV,'+pagoDetalle["NumeroDocumento"]+',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n'
+  let asiento_detalle='10-01-065,0,'+pagoDetalle["Monto"]+',"[P:'+pagoDetalle["IdPago"]+' D:'+pagoDetalle["IdDocumento"]+'] '+pagoDetalle["NomAux"]+ '",,,,,,,,,,,,,,,'+pagoDetalle["CodAux"]+',DP,62,'+pagoDetalle["FechaGral"]+',' +pagoDetalle["FechaGral"]+',FV,'+pagoDetalle["NumeroDocumento"]+',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\r\n'
   fs.appendFileSync(dirDestino+"/"+areaArchivo+".txt", asiento_detalle);
   })
 
@@ -123,7 +139,7 @@ return {path:dirDestino+"/"+x+'.txt',name:folderName+"/"+x+'.txt'}
 
 })
 console.log(downloadFiles)
-res.zip(
+return res.zip(
  downloadFiles
 
 );

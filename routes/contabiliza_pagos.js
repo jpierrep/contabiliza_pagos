@@ -8,6 +8,7 @@ var ContabilizaPagosController=require('../controllers/contabiliza_pagos');
 api.post('/getArchivosContables',ContabilizaPagosController.getArchivosContables);
 
 api.get('/mainView',ContabilizaPagosController.getContabilizaPagos);
+//api.get('/testApi',ContabilizaPagosController.getContabilizaPagos2);
 
 api.post('/getPagosMes',ContabilizaPagosController.getContabilizaPagosMes);
 

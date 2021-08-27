@@ -83,10 +83,11 @@
                             <th>TIPO PAGO</th>
                             <th>FECHA PAGO</th>
                             <th>TOTAL PAGO</th>
-					        <th>SALDO DOCTOS.</th>
-					        <th>MONTO CONTAB.</th>
+					        <th>SALDO SOFT.</th>
+					        <!-- <th>MONTO CONTAB.</th> -->
 					        <th>CANT. DOCTOS</th>
 					        <th>SALDO PAGOS</th>
+							<th>SALDO DOCTOS</th>
 					      </tr>
 					    </thead>
 					    <tbody>
@@ -100,10 +101,11 @@
                             <td><%=pagosResumen[x]['FechaGral'] %></td>
                             <td><%=  new Intl.NumberFormat('en-US', {style: 'decimal'}).format(pagosResumen[x]['MontoPagoTotal'])   %></td>
                             <td><%= new Intl.NumberFormat('en-US', {style: 'decimal'}).format(pagosResumen[x]['saldoDoctos'])  %></td>
-                            <td><%= new Intl.NumberFormat('en-US', {style: 'decimal'}).format(pagosResumen[x]['SumMontoPago'])  %></td>
+                          <!--    <td><%= new Intl.NumberFormat('en-US', {style: 'decimal'}).format(pagosResumen[x]['SumMontoPago'])  %></td> -->
                           
                             <td><%=pagosResumen[x]['CantDoctos']%></td>
                              <th scope="row" class="scope" ><%=new Intl.NumberFormat('en-US', {style: 'decimal'}).format(pagosResumen[x]['saldoPagos'])%></th> 
+							 <th scope="row" class="scope" ><%=new Intl.NumberFormat('en-US', {style: 'decimal'}).format(pagosResumen[x]['saldoDoctosTotal'])%></th> 
                              <!-- <td><a href="#" class="btn btn-primary">Sign Up</a></td> -->
 					      </tr>
                           <% }  %>  
@@ -229,8 +231,8 @@ url = window.URL.createObjectURL(new Blob(binaryData, {type: "application/zip"})
         
     },
     error: function (e) {
-
-      
+//se retorna status 500 cuando no hay data
+		alert('Error, no hay registros para contabilizar');
         console.log("ERROR : ", e);
 
 
@@ -272,10 +274,11 @@ let data={"empresa":empresa,"mes":mes}
   $('#pagos-table').append('<tr><td>' + row['NombreCliente'].substr(0,15) + '</td><td>' + row['CodigoCliente'] + '</td><td>' +
   row['IdPago'] + '</td><td>' + row['tipoPago'] + '</td><td>' + row['FechaGral'] + '</td><td>' +
 	new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['MontoPagoTotal'])+ '</td><td>' +new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['saldoDoctos']) 
-		+ '</td><td>' + new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['SumMontoPago']) + '</td><td>' 
+		+ '</td><td>' 
 		+	row['CantDoctos']+ '</td><th scope="row" class="scope" > '
-			+	new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['saldoPagos'])+ '</th></tr>');
-
+			+	new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['saldoPagos'])+ '</th><th scope="row" class="scope" > '
+			+	new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['saldoDoctosTotal'])+ '</th></tr>');
+	
 }
 
 

@@ -134,7 +134,9 @@ async function getPagosContabilizar(empresa,mes) {
    
 
 ---resumen por PAGO a contabilizar
-
+select *
+from
+(
 select IdPago,MontoPagoTotal,
 CodigoCliente,tipoPago,TipoPagoId,NombreCliente,convert(varchar,FechaGral,103) as FechaGral,
 sum(SoftSaldo) as saldoDoctos ,sum(monto) as SumMontoPago,count(NumeroDocumento) as CantDoctos,MontoPagoTotal-sum(monto) as saldoPagos,sum(SoftSaldo)-sum(monto) as saldoDoctosTotal
@@ -187,10 +189,20 @@ having SUM(MovDebe-MovHaber)<>0
 )a
 
 group by IdPago,MontoPagoTotal,CodigoCliente,tipoPago,TipoPagoId,NombreCliente,FechaGral
-order by MontoPagoTotal-sum(monto) asc,NombreCliente asc,CodigoCliente asc,FechaGral asc, IdPago asc
 
 
-  
+)b
+
+where not exists(
+  select * from
+  `+ empresaDetalle + `.[softland].[cwmovim] as mov 
+  left join
+  `+ empresaDetalle + `.softland.cwcpbte as comp on comp.CpbNum=mov.CpbNum and comp.CpbAno=mov.CpbAno and comp.CpbMes=mov.CpbMes
+  where 
+   mov.CpbMes!='00' and   comp.CpbEst='V' and   PctCod='10-01-065'
+  and MovGlosa like '%P:%'
+  and  MovGlosa like '%P:' + convert(varchar,b.IdPago) + '%')
+ order by saldoPagos asc,NombreCliente asc,CodigoCliente asc,FechaGral asc, IdPago asc
 
                            `,
       { type: sequelizeMssql.QueryTypes.SELECT, raw: true })
