@@ -94,7 +94,7 @@
 					      <tr>
                             <% for (var x = 0;x < pagosResumen.length;x++){ %>
 					        <!--  <th scope="row" class="scope" >.com</th> -->
-                            <td><%=pagosResumen[x]['NombreCliente'].substr(0,15)  %></td>
+                            <td><%=pagosResumen[x]['NombreCliente']?pagosResumen[x]['NombreCliente'].substr(0,15):''  %></td>
                             <td><%=pagosResumen[x]['CodigoCliente'] %></td>
                             <td><%=pagosResumen[x]['IdPago']%></td>
                             <td><%=pagosResumen[x]['tipoPago'] %></td>
@@ -270,8 +270,8 @@ let data={"empresa":empresa,"mes":mes}
    let rows=data["pagosResumen"]
   for (var i = 0; i < rows.length; i++) {
   var row = rows[i];
-
-  $('#pagos-table').append('<tr><td>' + row['NombreCliente'].substr(0,15) + '</td><td>' + row['CodigoCliente'] + '</td><td>' +
+  row['NombreCliente']= row['NombreCliente']?row['NombreCliente'].substr(0,15):''
+  $('#pagos-table').append('<tr><td>' + row['NombreCliente']+ '</td><td>' + row['CodigoCliente'] + '</td><td>' +
   row['IdPago'] + '</td><td>' + row['tipoPago'] + '</td><td>' + row['FechaGral'] + '</td><td>' +
 	new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['MontoPagoTotal'])+ '</td><td>' +new Intl.NumberFormat('en-US', {style: 'decimal'}).format(row['saldoDoctos']) 
 		+ '</td><td>' 
