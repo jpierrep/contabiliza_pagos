@@ -148,7 +148,7 @@ from
                   Select Enlaze.Documento as IdDocumento, CONVERT(int,replace(Documentos.Numero,' ','')) as NumeroDocumento,enlaze.Pago as IdPago, enlaze.Monto as Monto
                  ,Enlaze.Fecha as 'FechaPago',tabla.cantMovim as SoftCantMovim,tabla.saldo as SoftSaldo,tabla.fecha as SoftMinFecha,DocPago.Monto as MontoPagoTotal
                  ,DocPago.Fecha as FechaGral,DocPago.Numero as NumeroPago, DocPago.Rut as RutCliente,DocPago.Codigo as CodigoCliente,Documentos.Nombre as NombreDocto
-                 ,tipoPago.Descripcion as TipoPago,DocPago.Tipo as TipoPagoId,cli.Nombre as NombreCliente
+                 ,tipoPago.Descripcion as TipoPago,DocPago.Tipo as TipoPagoId,cli.Nombre as NombreCliente,MovTipDocRef
                  From 
                  
              
@@ -164,14 +164,14 @@ on  DocPago.Codigo=cli.Codigo and DocPago.Empresa=cli.Empresa
 left join Invoicing.dbo.TipoDeDocumentoDePago as tipoPago on DocPago.Tipo=tipoPago.IdTipo
            --     inner join @tabla as tabla on tabla.MovNumDocRef=CONVERT(int,replace(Documentos.Numero,' ',''))
                 inner join (
-         select MovNumDocRef, SUM(MovDebe-MovHaber) as saldo,Count(*) as cantMovim, MIN(movFe) as Fecha, aux.Codaux,aux.rutAux ,aux.NomAux 
+         select MovNumDocRef, SUM(MovDebe-MovHaber) as saldo,Count(*) as cantMovim, MIN(movFe) as Fecha, aux.Codaux,aux.rutAux ,aux.NomAux ,mov.MovTipDocRef
   FROM 
   `+ empresaDetalle + `.[softland].[cwmovim] as mov left join
   `+ empresaDetalle + `.[softland].[cwtauxi] as aux on mov.CodAux=AUX.CodAux left join 
   `+ empresaDetalle + `.softland.cwcpbte as comp on comp.CpbNum=mov.CpbNum and comp.CpbAno=mov.CpbAno and comp.CpbMes=mov.CpbMes 
    where  mov.CpbMes!='00' and   comp.CpbEst='V' and   PctCod='10-01-065'
  
-group by MovNumDocRef, aux.Codaux,rutAux,aux.NomAux
+group by MovNumDocRef, aux.Codaux,rutAux,aux.NomAux,MovTipDocRef
 
 having SUM(MovDebe-MovHaber)<>0
 
@@ -237,7 +237,7 @@ console.log(mes,mesConsulta,anioConsulta)
                      Select Enlaze.Documento as IdDocumento, CONVERT(int,replace(Documentos.Numero,' ','')) as NumeroDocumento,enlaze.Pago as IdPago, enlaze.Monto as Monto
                     ,Enlaze.Fecha as 'FechaPago',tabla.cantMovim as SoftCantMovim,tabla.saldo as SoftSaldo,tabla.fecha as SoftMinFecha,DocPago.Monto as MontoPagoTotal
                     ,convert(varchar,DocPago.Fecha,103) as FechaGral,DocPago.tipo as TipoPago,DocPago.Numero as NumeroPago, DocPago.Rut as RutCliente,DocPago.Codigo as CodigoCliente,Documentos.Nombre as NombreDocto
-                    ,CodAux,NomAux,AreaCod
+                    ,CodAux,NomAux,AreaCod,MovTipDocRef
                     
                     From 
                     
@@ -251,14 +251,14 @@ console.log(mes,mesConsulta,anioConsulta)
                    ON Enlaze.Pago = DocPago.Id_Pago
               --     inner join @tabla as tabla on tabla.MovNumDocRef=CONVERT(int,replace(Documentos.Numero,' ','))
                    inner join (
-            select MovNumDocRef,SUM(MovDebe-MovHaber) as saldo,Count(*) as cantMovim, MIN(movFe) as Fecha, aux.Codaux,aux.rutAux ,aux.NomAux ,mov.AreaCod
+            select MovNumDocRef,SUM(MovDebe-MovHaber) as saldo,Count(*) as cantMovim, MIN(movFe) as Fecha, aux.Codaux,aux.rutAux ,aux.NomAux ,mov.AreaCod,mov.MovTipDocRef
      FROM 
      `+ empresaDetalle + `.[softland].[cwmovim] as mov left join 
      `+ empresaDetalle + `.[softland].[cwtauxi] as aux on mov.CodAux=AUX.CodAux  left join 
      `+ empresaDetalle + `.softland.cwcpbte as comp on comp.CpbNum=mov.CpbNum and comp.CpbAno=mov.CpbAno and comp.CpbMes=mov.CpbMes 
       where  mov.CpbMes!='00' and   comp.CpbEst='V' and   PctCod='10-01-065'
     
-   group by MovNumDocRef, aux.Codaux,rutAux,aux.NomAux,mov.AreaCod
+   group by MovNumDocRef, aux.Codaux,rutAux,aux.NomAux,mov.AreaCod,mov.MovTipDocRef
    
    having SUM(MovDebe-MovHaber)<>0
  

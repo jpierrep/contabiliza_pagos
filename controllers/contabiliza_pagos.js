@@ -113,7 +113,7 @@ pagosResumen.filter(x=>x["AreaCod"]==areaArchivo). forEach(pago=>{
   //let asiento_detalle=
   pagosDetalle.filter(x=>x["IdPago"]==pago["IdPago"]).forEach(pagoDetalle=>{
   //  10-01-065,0,384413,SOPRAVAL SPA.  [P: 338204 D: 569912],,,,,,,,,,,,,,,82366700,DP,62,01/07/2021,01/07/2021,FV,216094 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  let asiento_detalle='10-01-065,0,'+pagoDetalle["Monto"]+',"[P:'+pagoDetalle["IdPago"]+' D:'+pagoDetalle["IdDocumento"]+'] '+pagoDetalle["NomAux"]+ '",,,,,,,,,,,,,,,'+pagoDetalle["CodAux"]+',DP,62,'+pagoDetalle["FechaGral"]+',' +pagoDetalle["FechaGral"]+',FV,'+pagoDetalle["NumeroDocumento"]+',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\r\n'
+  let asiento_detalle='10-01-065,0,'+pagoDetalle["Monto"]+',"[P:'+pagoDetalle["IdPago"]+' D:'+pagoDetalle["IdDocumento"]+'] '+pagoDetalle["NomAux"]+ '",,,,,,,,,,,,,,,'+pagoDetalle["CodAux"]+',DP,62,'+pagoDetalle["FechaGral"]+',' +pagoDetalle["FechaGral"]+','+pagoDetalle["MovTipDocRef"]+','+pagoDetalle["NumeroDocumento"]+',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\r\n'
   fs.appendFileSync(dirDestino+"/"+areaArchivo+".txt", asiento_detalle);
   })
 
