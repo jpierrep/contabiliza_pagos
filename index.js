@@ -22,7 +22,7 @@ var server = app.listen(5000, function () {
 
 
 var app=require('./app');
-var port= 3800;
+var port= 3700;
 var ip='0.0.0.0';
 
 
